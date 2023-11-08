@@ -1,0 +1,185 @@
+let Board= [
+    ['', '', ''],
+    ['' ,'' ,''],
+    ['', '', ''],
+]; 
+
+
+let w; 
+let h;
+let i;
+
+let ai ='X';
+let human ='O';
+let currentplayer =human;
+
+
+function setup() {
+  createCanvas(400, 400);
+   w=width/3;
+   h=height/3;
+  Bestmove();
+  
+  }
+function equals3(a,b,c){
+  return (a==b && b==c && a!='');
+    
+  
+}
+function checkwinner(){
+  let winner = null;
+  
+  //horizontal
+  for(let i=0;i<3;i++){
+    if(equals3(Board[i][0] , Board[i][1] , Board[i][2])){
+      winner =Board [i][0]
+      break;
+    }
+  }
+  //vertical
+  for(let i=0;i<3;i++){
+    if(equals3(Board[0][i], Board[1][i], Board[2][i])){
+      winner =Board [0][i]
+      break;
+    }
+  }
+  //diogonal
+  if(equals3(Board[0][0] , Board[1][1] , Board[2][2])){
+      winner =Board [0][0]
+    }
+  
+  if(equals3(Board[2][0] , Board[1][1] , Board[0][2])){
+      winner =Board [2][0]
+    }
+  
+  let openspot=0;
+   for(let i=0;i<3;i++){
+    for(let j=0;j<3;j++){
+      if (Board[i][j] == '') {
+        openspot++;
+      }
+      
+    }}
+  if(winner==null && openspot==0){
+    return "tie";
+  }else{
+    return winner;
+  }
+}
+
+ function Bestmove(){
+    let bestscore=-Infinity;
+     let move =null;
+   for(let i=0;i<3;i++){
+    for(let j=0;j<3;j++){
+      if(Board[i][j]==''){
+       Board[i][j]=ai;
+        let score= minimax(Board,0,false);
+         Board[i][j]='';
+
+        if(score>bestscore){
+          bestscore=score;
+          move={i,j};
+        }
+      }
+    }
+  }
+   if (move !== null) {
+        Board[move.i][move.j] = ai;
+        currentplayer = human;
+    }
+}
+let scores={
+    X: +1,
+    O: -1,
+    tie: 0
+  
+  
+};
+
+
+function minimax(Board,depth,isMaximizing){
+  let result = checkwinner();
+  if(result!==null){
+    return   scores[result];
+   
+  }
+  if(isMaximizing){
+    let bestscore=-Infinity;
+    for(let i=0;i<3;i++){
+    for(let j=0;j<3;j++){
+      if(Board[i][j]==''){
+       Board[i][j]=ai;
+        let score= minimax(Board,depth+1,false);
+         Board[i][j]='';
+        bestscore=max(score,bestscore);
+
+      }
+    }
+    }
+  return bestscore;
+  }
+  else {
+    let bestscore=Infinity;
+    for(let i=0;i<3;i++){
+    for(let j=0;j<3;j++){
+      if(Board[i][j]==''){
+       Board[i][j]=human;
+        let score= minimax(Board,depth+1,true);
+         Board[i][j]='';
+          bestscore=min(score,bestscore);
+            
+          }
+        }
+      }
+    return bestscore;
+  }
+
+
+  
+}
+function mousePressed(){
+  if(currentplayer==human){
+    let i=floor(mouseX /w);
+    let j=floor(mouseY /h);
+    if(Board[i][j]==''){
+       Board[i][j]=human;
+      currentplayer=ai;
+      Bestmove();
+    
+  }
+}}
+function draw() {
+  background(255);
+  strokeWeight(4);
+   let w= width/3;
+    let h=height/3;
+    line(w,0,w,height);
+    line(w*2,0,w*2,height);
+    line(0,h,width,h);
+    line(0,h*2,width,h*2);
+
+    for (let j = 0; j < 3; j++) {
+    for (let i = 0; i < 3; i++) {
+      let x = w * i + w / 2;
+      let y = h * j + h / 2;
+      let spot = Board[i][j];
+      textSize(35);
+      let r = w / 4;
+      if (spot == human) {
+        noFill();
+        ellipse(x, y, r * 2);
+      } else if (spot == ai) {
+        line(x - r, y - r, x + r, y + r);
+        line(x + r, y - r, x - r, y + r);
+      }
+    }
+  }
+    let result= checkwinner();
+    if(result!=null){
+      noLoop();
+      let resultp= createP('');
+        resultp.style('color','#FFF' ).style('font-size','32pt')
+      console.log(result);
+    
+}}
